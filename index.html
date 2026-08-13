@@ -1,359 +1,974 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hướng dẫn sửa lỗi 404 GitHub Pages</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🐍 Rắn Ăn Táo - 15 Màn</title>
     <style>
-        /* ===== Reset & Base ===== */
+        /* ============================================================
+                   RESET & BASE
+                   ============================================================ */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #0d1117;
-            color: #c9d1d9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(145deg, #0a0e1a, #1a2a3a);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            user-select: none;
         }
-        .container {
-            max-width: 860px;
+
+        .game-wrapper {
+            max-width: 700px;
             width: 100%;
-            background: #161b22;
-            border-radius: 24px;
-            padding: 2.5rem;
-            border: 1px solid #30363d;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            background: linear-gradient(165deg, #1a2a3a, #0d1a2a);
+            border-radius: 40px;
+            padding: 25px 25px 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            border: 1px solid #2a4a5a;
         }
-        /* ===== Header ===== */
+
+        /* ============================================================
+                   HEADER
+                   ============================================================ */
         .header {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 2rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid #30363d;
-        }
-        .header .icon {
-            font-size: 2.4rem;
-            line-height: 1;
-        }
-        .header h1 {
-            font-size: 1.6rem;
-            font-weight: 600;
-            color: #f0f6fc;
-            letter-spacing: -0.3px;
-        }
-        .header .badge {
-            margin-left: auto;
-            background: #21262d;
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            color: #8b949e;
-            border: 1px solid #30363d;
-        }
-        /* ===== Error Preview ===== */
-        .error-preview {
-            background: #0d1117;
-            border-radius: 12px;
-            padding: 1.2rem 1.8rem;
-            margin-bottom: 2rem;
-            border-left: 4px solid #f85149;
-            font-family: 'Courier New', monospace;
-        }
-        .error-preview .code {
-            color: #f85149;
-            font-weight: 700;
-            font-size: 1.2rem;
-        }
-        .error-preview .message {
-            color: #8b949e;
-            font-size: 0.95rem;
-            margin-top: 4px;
-        }
-        /* ===== Steps ===== */
-        .step {
-            background: #0d1117;
-            border-radius: 12px;
-            padding: 1.2rem 1.5rem;
-            margin-bottom: 1rem;
-            border: 1px solid #21262d;
-            transition: border-color 0.2s;
-        }
-        .step:hover {
-            border-color: #30363d;
-        }
-        .step .step-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 8px;
-        }
-        .step .step-num {
-            background: #238636;
-            color: #fff;
-            font-weight: 700;
-            font-size: 0.8rem;
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        .step .step-title {
-            font-weight: 600;
-            font-size: 1.05rem;
-            color: #f0f6fc;
-        }
-        .step .step-desc {
-            color: #8b949e;
-            font-size: 0.92rem;
-            line-height: 1.6;
-            padding-left: 38px;
-        }
-        .step .step-desc code {
-            background: #21262d;
-            padding: 2px 10px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            color: #f0883e;
-            border: 1px solid #30363d;
-        }
-        .step .step-desc .highlight {
-            color: #58a6ff;
-        }
-        /* ===== Code Block ===== */
-        .code-block {
-            background: #0d1117;
-            border-radius: 8px;
-            padding: 0.8rem 1.2rem;
-            margin: 10px 0 4px 38px;
-            border: 1px solid #21262d;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            color: #e6edf3;
-            overflow-x: auto;
-            white-space: pre-wrap;
-            word-break: break-all;
-        }
-        .code-block .comment {
-            color: #8b949e;
-        }
-        .code-block .cmd {
-            color: #58a6ff;
-        }
-        /* ===== Checklist ===== */
-        .checklist {
-            background: #0d1117;
-            border-radius: 12px;
-            padding: 1.2rem 1.5rem;
-            margin-top: 1.5rem;
-            border: 1px solid #21262d;
-        }
-        .checklist h3 {
-            font-size: 0.95rem;
-            color: #8b949e;
-            margin-bottom: 10px;
-            font-weight: 400;
-        }
-        .checklist ul {
-            list-style: none;
-            padding: 0;
-        }
-        .checklist li {
-            padding: 6px 0;
-            padding-left: 28px;
-            position: relative;
-            font-size: 0.92rem;
-            color: #c9d1d9;
-            border-bottom: 1px solid #161b22;
-        }
-        .checklist li::before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: #238636;
-            font-weight: 700;
-        }
-        .checklist li .warn {
-            color: #d29922;
-        }
-        /* ===== Footer ===== */
-        .footer {
-            margin-top: 2rem;
-            padding-top: 1.2rem;
-            border-top: 1px solid #21262d;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px 12px;
+            margin-bottom: 14px;
         }
-        .footer .note {
-            color: #8b949e;
-            font-size: 0.8rem;
+
+        .header h1 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6fcf97, #f2c94a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 8px rgba(0, 200, 100, 0.2));
+            letter-spacing: 1px;
         }
-        .footer .note a {
-            color: #58a6ff;
-            text-decoration: none;
-        }
-        .footer .note a:hover {
-            text-decoration: underline;
-        }
-        .btn {
-            background: #238636;
-            border: none;
-            color: #fff;
-            padding: 8px 20px;
-            border-radius: 8px;
-            font-weight: 600;
+
+        .header .stats {
+            display: flex;
+            gap: 18px;
+            color: #aaccee;
             font-size: 0.9rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 4px 16px;
+            border-radius: 30px;
+            border: 1px solid #2a4a5a;
+            flex-wrap: wrap;
+        }
+
+        .header .stats span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .header .stats .score {
+            color: #f2c94a;
+            font-weight: 700;
+        }
+        .header .stats .level {
+            color: #6fcf97;
+            font-weight: 700;
+        }
+
+        /* ============================================================
+                   LEVEL SELECTOR (màn đã chơi)
+                   ============================================================ */
+        .level-bar {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px 12px;
+            border-radius: 30px;
+            border: 1px solid #1a3a4a;
+        }
+
+        .level-btn {
+            padding: 4px 14px;
+            border-radius: 20px;
+            border: 1px solid #2a4a5a;
+            background: rgba(255, 255, 255, 0.03);
+            color: #557788;
+            font-size: 0.7rem;
+            font-weight: 700;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.25s;
+            font-family: inherit;
         }
-        .btn:hover {
-            background: #2ea043;
+
+        .level-btn.unlocked {
+            color: #aaccee;
+            border-color: #3a6a7a;
+            background: rgba(100, 200, 255, 0.05);
         }
-        /* ===== Responsive ===== */
+
+        .level-btn.unlocked:hover {
+            background: rgba(100, 200, 255, 0.15);
+            transform: scale(1.05);
+            border-color: #6fcf97;
+        }
+
+        .level-btn.locked {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .level-btn.current {
+            background: rgba(111, 207, 151, 0.2);
+            border-color: #6fcf97;
+            color: #6fcf97;
+            box-shadow: 0 0 20px rgba(111, 207, 151, 0.1);
+        }
+
+        .level-btn.completed {
+            border-color: #f2c94a;
+            color: #f2c94a;
+        }
+
+        /* ============================================================
+                   CANVAS
+                   ============================================================ */
+        .canvas-wrapper {
+            background: #0d1a2a;
+            border-radius: 24px;
+            padding: 10px;
+            border: 1px solid #2a4a5a;
+            box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.6);
+            position: relative;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background: #0f1f2f;
+            border-radius: 16px;
+            image-rendering: pixelated;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.4);
+            touch-action: none;
+        }
+
+        /* ============================================================
+                   CONTROLS
+                   ============================================================ */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .btn {
+            padding: 10px 28px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6fcf97, #27ae60);
+            color: #0a1a1a;
+            box-shadow: 0 4px 16px rgba(111, 207, 151, 0.25);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(111, 207, 151, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: #aaccee;
+            border: 1px solid #2a4a5a;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-danger {
+            background: rgba(200, 60, 60, 0.15);
+            color: #e8a0a0;
+            border: 1px solid #4a2a2a;
+        }
+
+        .btn-danger:hover {
+            background: rgba(200, 60, 60, 0.3);
+        }
+
+        /* ============================================================
+                   MESSAGE
+                   ============================================================ */
+        .message {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 0.9rem;
+            color: #88aabb;
+            min-height: 26px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px 12px;
+            border-radius: 30px;
+            border: 1px solid #1a3a4a;
+        }
+
+        .message .highlight {
+            color: #f2c94a;
+            font-weight: 700;
+        }
+
+        .message .success {
+            color: #6fcf97;
+            font-weight: 700;
+        }
+
+        .message .danger {
+            color: #f28b82;
+            font-weight: 700;
+        }
+
+        /* ============================================================
+                   RESPONSIVE
+                   ============================================================ */
         @media (max-width: 600px) {
-            .container { padding: 1.5rem; }
-            .step .step-desc { padding-left: 0; }
-            .code-block { margin-left: 0; }
-            .header h1 { font-size: 1.2rem; }
-            .step .step-title { font-size: 0.95rem; }
+            .game-wrapper {
+                padding: 14px;
+            }
+            .header h1 {
+                font-size: 1.3rem;
+            }
+            .header .stats {
+                font-size: 0.75rem;
+                padding: 2px 12px;
+                gap: 10px;
+            }
+            .level-btn {
+                font-size: 0.6rem;
+                padding: 2px 10px;
+            }
+            .btn {
+                font-size: 0.8rem;
+                padding: 8px 18px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .level-bar {
+                gap: 4px;
+            }
+            .level-btn {
+                font-size: 0.5rem;
+                padding: 2px 7px;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0d1a2a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a4a5a;
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
 
-<div class="container" role="main">
-
-    <!-- ===== HEADER ===== -->
-    <div class="header">
-        <span class="icon">🚀</span>
-        <h1>GitHub Pages 404 Fix</h1>
-        <span class="badge">v1.0</span>
-    </div>
-
-    <!-- ===== ERROR DISPLAY ===== -->
-    <div class="error-preview">
-        <div class="code">404 — File not found</div>
-        <div class="message">
-            The site configured at this address does not contain the requested file.
-        </div>
-    </div>
-
-    <!-- ===== STEPS ===== -->
-    <div class="step">
-        <div class="step-header">
-            <span class="step-num">1</span>
-            <span class="step-title">Kiểm tra file <code>index.html</code></span>
-        </div>
-        <div class="step-desc">
-            GitHub Pages yêu cầu file <strong>index.html</strong> ở <span class="highlight">thư mục gốc</span> (root) của branch được cấu hình.
-            <div class="code-block">
-                <span class="comment"># Cấu trúc thư mục hợp lệ:</span>
-                my-repo/
-                ├── index.html      <span class="comment">← BẮT BUỘC</span>
-                ├── style.css
-                └── script.js
+    <div class="game-wrapper">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>🐍 RẮN ĂN TÁO</h1>
+            <div class="stats">
+                <span>🍎 <span class="score" id="scoreDisplay">0</span></span>
+                <span>📦 Màn <span class="level" id="levelDisplay">1</span>/15</span>
             </div>
         </div>
-    </div>
 
-    <div class="step">
-        <div class="step-header">
-            <span class="step-num">2</span>
-            <span class="step-title">Kiểm tra branch &amp; thư mục nguồn</span>
-        </div>
-        <div class="step-desc">
-            Vào <strong>Settings → Pages</strong> kiểm tra:
-            <ul style="margin:8px 0 0 20px;color:#8b949e;list-style:disc;">
-                <li>Branch: <code>main</code> hoặc <code>gh-pages</code></li>
-                <li>Folder: <code>/ (root)</code> hoặc <code>/docs</code></li>
-            </ul>
-            <div class="code-block">
-                <span class="comment"># Nếu dùng /docs, cấu trúc phải là:</span>
-                my-repo/
-                └── docs/
-                    └── index.html   <span class="comment">← file trong docs/</span>
-            </div>
-        </div>
-    </div>
+        <!-- LEVEL BAR -->
+        <div class="level-bar" id="levelBar"></div>
 
-    <div class="step">
-        <div class="step-header">
-            <span class="step-num">3</span>
-            <span class="step-title">Kiểm tra tên file (phân biệt chữ hoa/thường)</span>
+        <!-- CANVAS -->
+        <div class="canvas-wrapper">
+            <canvas id="gameCanvas" width="400" height="400"></canvas>
         </div>
-        <div class="step-desc">
-            GitHub Pages <span class="highlight">phân biệt chữ hoa chữ thường</span>.
-            <br><code>Index.html</code> ≠ <code>index.html</code>
-            <br>Đảm bảo URL trỏ đúng tên file (ví dụ: <code>/About.html</code>).
+
+        <!-- CONTROLS -->
+        <div class="controls">
+            <button class="btn btn-primary" id="btnStart">▶ Bắt đầu</button>
+            <button class="btn btn-secondary" id="btnPause">⏸ Tạm dừng</button>
+            <button class="btn btn-danger" id="btnReset">🔄 Reset màn</button>
+        </div>
+
+        <!-- MESSAGE -->
+        <div class="message" id="message">
+            🎯 Nhấn <span class="highlight">Bắt đầu</span> hoặc phím <span class="highlight">Space</span>
         </div>
     </div>
 
-    <div class="step">
-        <div class="step-header">
-            <span class="step-num">4</span>
-            <span class="step-title">Cấp quyền &amp; deploy lại</span>
-        </div>
-        <div class="step-desc">
-            Sau khi push code, đợi <strong>1-2 phút</strong> để GitHub build.
-            <br>Vào <strong>Actions</strong> kiểm tra workflow có thành công không.
-            <div class="code-block">
-                <span class="comment"># Force redeploy:</span>
-                <span class="cmd">git commit --allow-empty -m "trigger rebuild"</span>
-                <span class="cmd">git push origin main</span>
-            </div>
-        </div>
-    </div>
+    <!-- ============================================================
+    JAVASCRIPT — GAME ENGINE
+    ============================================================ -->
+    <script>
+        (function() {
+            'use strict';
 
-    <!-- ===== CHECKLIST ===== -->
-    <div class="checklist">
-        <h3>📋 Kiểm tra nhanh</h3>
-        <ul>
-            <li>✅ Đã có <strong>index.html</strong> ở thư mục gốc hoặc /docs</li>
-            <li>✅ Branch đúng (main / gh-pages) và folder được chọn</li>
-            <li>✅ Tên file viết <strong>thường</strong> (index.html)</li>
-            <li>✅ Đã commit &amp; push lên remote</li>
-            <li>✅ Đợi ít nhất 2 phút sau khi push</li>
-            <li>⚠️ <span class="warn">Nếu dùng custom domain, kiểm tra file CNAME</span></li>
-        </ul>
-    </div>
+            // ============================================================
+            //  CONFIG
+            // ============================================================
+            const GRID_SIZE = 20;
+            const CANVAS_SIZE = 400;
+            const CELL_SIZE = CANVAS_SIZE / GRID_SIZE;
 
-    <!-- ===== FOOTER ===== -->
-    <div class="footer">
-        <span class="note">
-            📘 <a href="https://docs.github.com/en/pages" target="_blank">GitHub Pages Docs</a>
-        </span>
-        <button class="btn" id="refreshTip">🔄 Đã fix? F5</button>
-    </div>
+            // 15 màn chơi: mỗi màn có số táo và chướng ngại vật khác nhau
+            // Tất cả đều có cách giải (luôn có đường đi)
+            const LEVELS = [
+                { apples: 3, walls: [], label: 'Dễ 1' },
+                { apples: 4, walls: [
+                        [5, 5],
+                        [6, 5],
+                        [7, 5]
+                    ], label: 'Dễ 2' },
+                { apples: 5, walls: [
+                        [2, 2],
+                        [2, 3],
+                        [2, 4],
+                        [17, 17],
+                        [17, 16]
+                    ], label: 'TB 1' },
+                { apples: 5, walls: [
+                        [3, 3],
+                        [4, 3],
+                        [5, 3],
+                        [14, 16],
+                        [15, 16],
+                        [16, 16]
+                    ], label: 'TB 2' },
+                { apples: 6, walls: [
+                        [1, 1],
+                        [1, 2],
+                        [1, 3],
+                        [18, 18],
+                        [18, 17],
+                        [18, 16],
+                        [10, 10]
+                    ], label: 'TB 3' },
+                { apples: 6, walls: [
+                        [4, 4],
+                        [5, 4],
+                        [6, 4],
+                        [7, 4],
+                        [12, 15],
+                        [13, 15],
+                        [14, 15]
+                    ], label: 'TB 4' },
+                { apples: 7, walls: [
+                        [2, 2],
+                        [2, 3],
+                        [2, 4],
+                        [2, 5],
+                        [17, 14],
+                        [17, 15],
+                        [17, 16],
+                        [17, 17]
+                    ], label: 'Khó 1' },
+                { apples: 7, walls: [
+                        [3, 3],
+                        [4, 3],
+                        [5, 3],
+                        [6, 3],
+                        [13, 16],
+                        [14, 16],
+                        [15, 16],
+                        [16, 16]
+                    ], label: 'Khó 2' },
+                { apples: 8, walls: [
+                        [1, 1],
+                        [1, 2],
+                        [1, 3],
+                        [1, 4],
+                        [18, 15],
+                        [18, 16],
+                        [18, 17],
+                        [18, 18],
+                        [9, 10]
+                    ], label: 'Khó 3' },
+                { apples: 8, walls: [
+                        [5, 2],
+                        [6, 2],
+                        [7, 2],
+                        [8, 2],
+                        [11, 17],
+                        [12, 17],
+                        [13, 17],
+                        [14, 17],
+                        [3, 10]
+                    ], label: 'Khó 4' },
+                { apples: 9, walls: [
+                        [2, 2],
+                        [2, 3],
+                        [2, 4],
+                        [2, 5],
+                        [2, 6],
+                        [17, 13],
+                        [17, 14],
+                        [17, 15],
+                        [17, 16],
+                        [17, 17]
+                    ], label: 'Cực khó 1' },
+                { apples: 9, walls: [
+                        [4, 4],
+                        [4, 5],
+                        [4, 6],
+                        [4, 7],
+                        [4, 8],
+                        [15, 11],
+                        [15, 12],
+                        [15, 13],
+                        [15, 14],
+                        [15, 15]
+                    ], label: 'Cực khó 2' },
+                { apples: 10, walls: [
+                        [1, 1],
+                        [1, 2],
+                        [1, 3],
+                        [1, 4],
+                        [1, 5],
+                        [18, 14],
+                        [18, 15],
+                        [18, 16],
+                        [18, 17],
+                        [18, 18],
+                        [9, 9]
+                    ], label: 'Cực khó 3' },
+                { apples: 10, walls: [
+                        [3, 3],
+                        [4, 3],
+                        [5, 3],
+                        [6, 3],
+                        [7, 3],
+                        [8, 3],
+                        [11, 16],
+                        [12, 16],
+                        [13, 16],
+                        [14, 16],
+                        [15, 16]
+                    ], label: 'Cực khó 4' },
+                { apples: 12, walls: [
+                        [2, 2],
+                        [3, 2],
+                        [4, 2],
+                        [5, 2],
+                        [6, 2],
+                        [7, 2],
+                        [8, 2],
+                        [11, 17],
+                        [12, 17],
+                        [13, 17],
+                        [14, 17],
+                        [15, 17],
+                        [16, 17],
+                        [17, 17],
+                        [9, 10]
+                    ], label: 'BOSS' },
+            ];
 
-</div>
+            // ============================================================
+            //  STATE
+            // ============================================================
+            let currentLevel = 0; // 0-based
+            let snake = [];
+            let direction = { dx: 1, dy: 0 };
+            let nextDirection = { dx: 1, dy: 0 };
+            let food = null;
+            let walls = [];
+            let score = 0;
+            let applesEaten = 0;
+            let applesNeeded = 0;
+            let gameRunning = false;
+            let gamePaused = false;
+            let gameOver = false;
+            let levelCompleted = false;
+            let gameLoopInterval = null;
+            let speed = 150; // ms
+            let unlockedLevels = [true]; // màn 1 luôn mở
+            let completedLevels = [];
 
-<script>
-    // ============================================================
-    //  Tương tác nhỏ: nhắc nhở refresh
-    // ============================================================
-    document.getElementById('refreshTip').addEventListener('click', function() {
-        const msg = '🔄 Sau khi fix, hãy F5 hoặc truy cập lại URL.\n\nNếu vẫn lỗi, kiểm tra lại các bước trên.';
-        alert(msg);
-        // Optional: mở trang chủ của site
-        // window.location.href = window.location.origin + '/';
-    });
+            // DOM refs
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            const levelDisplay = document.getElementById('levelDisplay');
+            const messageEl = document.getElementById('message');
+            const levelBar = document.getElementById('levelBar');
+            const btnStart = document.getElementById('btnStart');
+            const btnPause = document.getElementById('btnPause');
+            const btnReset = document.getElementById('btnReset');
 
-    // Tự động detect nếu đang ở trang 404 và có index.html?
-    console.log('🔧 GitHub Pages 404 Fix Tool loaded');
-</script>
+            // ============================================================
+            //  LEVEL HELPERS
+            // ============================================================
+            function getLevelConfig(levelIndex) {
+                const lvl = LEVELS[levelIndex];
+                return {
+                    applesNeeded: lvl.apples,
+                    walls: lvl.walls.map(([x, y]) => ({ x, y })),
+                    label: lvl.label,
+                };
+            }
 
-</body>
-              </html>
+            function isValidCell(x, y, snakePositions, wallsPos) {
+                if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) return false;
+                for (let s of snakePositions) {
+                    if (s.x === x && s.y === y) return false;
+                }
+                for (let w of wallsPos) {
+                    if (w.x === x && w.y === y) return false;
+                }
+                return true;
+            }
+
+            function generateFood(snakePos, wallsPos) {
+                const free = [];
+                for (let x = 0; x < GRID_SIZE; x++) {
+                    for (let y = 0; y < GRID_SIZE; y++) {
+                        if (isValidCell(x, y, snakePos, wallsPos)) {
+                            free.push({ x, y });
+                        }
+                    }
+                }
+                if (free.length === 0) return null;
+                return free[Math.floor(Math.random() * free.length)];
+            }
+
+            // ============================================================
+            //  GAME INIT
+            // ============================================================
+            function initLevel(levelIndex) {
+                const config = getLevelConfig(levelIndex);
+                applesNeeded = config.applesNeeded;
+                walls = config.walls.map(w => ({ ...w }));
+
+                // Snake: bắt đầu ở giữa, dài 3
+                const mid = Math.floor(GRID_SIZE / 2);
+                snake = [
+                    { x: mid, y: mid },
+                    { x: mid - 1, y: mid },
+                    { x: mid - 2, y: mid },
+                ];
+                direction = { dx: 1, dy: 0 };
+                nextDirection = { dx: 1, dy: 0 };
+                applesEaten = 0;
+                score = 0;
+                gameOver = false;
+                levelCompleted = false;
+                gamePaused = false;
+
+                // Tạo thức ăn
+                food = generateFood(snake, walls);
+                if (!food) {
+                    // Nếu không có chỗ, thử đặt ở vị trí cố định
+                    food = { x: 5, y: 5 };
+                    if (!isValidCell(5, 5, snake, walls)) {
+                        food = { x: 10, y: 10 };
+                    }
+                }
+
+                updateUI();
+                render();
+                setMessage(`Màn ${levelIndex+1}: ăn ${applesNeeded} 🍎 để thắng!`, true);
+                updateLevelBar();
+                btnStart.textContent = '▶ Bắt đầu';
+                btnStart.disabled = false;
+                btnPause.textContent = '⏸ Tạm dừng';
+                btnPause.disabled = true;
+                if (gameLoopInterval) {
+                    clearInterval(gameLoopInterval);
+                    gameLoopInterval = null;
+                }
+                gameRunning = false;
+            }
+
+            // ============================================================
+            //  GAME LOOP
+            // ============================================================
+            function startGame() {
+                if (gameRunning && !gamePaused) return;
+                if (gameOver || levelCompleted) {
+                    // Reset nếu game over hoặc đã hoàn thành
+                    initLevel(currentLevel);
+                    // Sau đó start
+                    setTimeout(() => startGame(), 50);
+                    return;
+                }
+                if (gamePaused) {
+                    gamePaused = false;
+                    btnPause.textContent = '⏸ Tạm dừng';
+                    setMessage('▶ Tiếp tục...', true);
+                    return;
+                }
+
+                gameRunning = true;
+                gamePaused = false;
+                btnStart.textContent = '▶ Đang chơi';
+                btnStart.disabled = true;
+                btnPause.disabled = false;
+                btnPause.textContent = '⏸ Tạm dừng';
+                setMessage('🐍 Đang chơi...', true);
+
+                if (gameLoopInterval) clearInterval(gameLoopInterval);
+                gameLoopInterval = setInterval(() => {
+                    if (!gamePaused && !gameOver && !levelCompleted) {
+                        update();
+                        render();
+                    }
+                }, speed);
+            }
+
+            function pauseGame() {
+                if (!gameRunning || gameOver || levelCompleted) return;
+                gamePaused = !gamePaused;
+                btnPause.textContent = gamePaused ? '▶ Tiếp tục' : '⏸ Tạm dừng';
+                setMessage(gamePaused ? '⏸ Đã tạm dừng' : '▶ Tiếp tục...', true);
+            }
+
+            function resetLevel() {
+                if (gameLoopInterval) {
+                    clearInterval(gameLoopInterval);
+                    gameLoopInterval = null;
+                }
+                gameRunning = false;
+                gamePaused = false;
+                initLevel(currentLevel);
+                btnStart.textContent = '▶ Bắt đầu';
+                btnStart.disabled = false;
+                btnPause.disabled = true;
+                setMessage('🔄 Đã reset màn này', true);
+            }
+
+            // ============================================================
+            //  UPDATE
+            // ============================================================
+            function update() {
+                if (gameOver || levelCompleted) return;
+
+                // Cập nhật hướng
+                direction = { ...nextDirection };
+
+                // Tính đầu mới
+                const head = snake[0];
+                const newHead = {
+                    x: head.x + direction.dx,
+                    y: head.y + direction.dy,
+                };
+
+                // Kiểm tra va chạm tường biên
+                if (newHead.x < 0 || newHead.x >= GRID_SIZE || newHead.y < 0 || newHead.y >= GRID_SIZE) {
+                    gameOver = true;
+                    endGame('Bạn đã đâm vào tường! 💥');
+                    return;
+                }
+
+                // Kiểm tra va chạm tường (chướng ngại vật)
+                for (let w of walls) {
+                    if (w.x === newHead.x && w.y === newHead.y) {
+                        gameOver = true;
+                        endGame('Bạn đã đâm vào chướng ngại vật! 🧱');
+                        return;
+                    }
+                }
+
+                // Kiểm tra va chạm với thân (trừ đuôi nếu không ăn)
+                const willEat = food && newHead.x === food.x && newHead.y === food.y;
+                let tail = null;
+                if (!willEat) {
+                    tail = snake.pop();
+                }
+
+                // Kiểm tra va chạm với thân
+                for (let s of snake) {
+                    if (s.x === newHead.x && s.y === newHead.y) {
+                        gameOver = true;
+                        if (tail) snake.push(tail); // restore
+                        endGame('Rắn đã cắn vào thân! 🔄');
+                        return;
+                    }
+                }
+
+                // Thêm đầu mới
+                snake.unshift(newHead);
+
+                // Xử lý ăn táo
+                if (willEat) {
+                    applesEaten++;
+                    score += 10;
+                    // Tạo thức ăn mới
+                    food = generateFood(snake, walls);
+                    if (!food) {
+                        // Nếu không còn chỗ, kiểm tra thắng
+                        if (applesEaten >= applesNeeded) {
+                            levelCompleted = true;
+                            completeLevel();
+                            return;
+                        }
+                        // Nếu chưa đủ táo mà hết chỗ => game over (kẹt)
+                        gameOver = true;
+                        endGame('Không còn chỗ cho táo! 😵');
+                        return;
+                    }
+
+                    // Kiểm tra thắng
+                    if (applesEaten >= applesNeeded) {
+                        levelCompleted = true;
+                        completeLevel();
+                        return;
+                    }
+                }
+
+                updateUI();
+                render();
+            }
+
+            function endGame(msg) {
+                gameRunning = false;
+                btnStart.textContent = '🔄 Thử lại';
+                btnStart.disabled = false;
+                btnPause.disabled = true;
+                if (gameLoopInterval) {
+                    clearInterval(gameLoopInterval);
+                    gameLoopInterval = null;
+                }
+                setMessage(`💀 ${msg}`, false);
+                render();
+            }
+
+            function completeLevel() {
+                gameRunning = false;
+                btnStart.textContent = '✅ Hoàn thành!';
+                btnStart.disabled = false;
+                btnPause.disabled = true;
+                if (gameLoopInterval) {
+                    clearInterval(gameLoopInterval);
+                    gameLoopInterval = null;
+                }
+
+                // Mở khóa màn tiếp theo nếu chưa
+                if (currentLevel + 1 < LEVELS.length && !unlockedLevels[currentLevel + 1]) {
+                    unlockedLevels[currentLevel + 1] = true;
+                }
+                if (!completedLevels.includes(currentLevel)) {
+                    completedLevels.push(currentLevel);
+                }
+                updateLevelBar();
+                setMessage(`🎉 Màn ${currentLevel+1} HOÀN THÀNH! Chúc mừng!`, true);
+                render();
+            }
+
+            // ============================================================
+            //  RENDER
+            // ============================================================
+            function render() {
+                ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+                // Vẽ nền
+                const grad = ctx.createLinearGradient(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+                grad.addColorStop(0, '#0f1f2f');
+                grad.addColorStop(1, '#1a2a3a');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+                // Vẽ lưới (mờ)
+                ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+                ctx.lineWidth = 0.5;
+                for (let i = 0; i <= GRID_SIZE; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(i * CELL_SIZE, 0);
+                    ctx.lineTo(i * CELL_SIZE, CANVAS_SIZE);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(0, i * CELL_SIZE);
+                    ctx.lineTo(CANVAS_SIZE, i * CELL_SIZE);
+                    ctx.stroke();
+                }
+
+                // Vẽ tường (chướng ngại vật)
+                for (let w of walls) {
+                    const x = w.x * CELL_SIZE;
+                    const y = w.y * CELL_SIZE;
+                    ctx.fillStyle = '#3a2a2a';
+                    ctx.shadowColor = '#8a4a4a';
+                    ctx.shadowBlur = 6;
+                    ctx.fillRect(x + 1, y + 1, CELL_SIZE - 2, CELL_SIZE - 2);
+                    ctx.shadowBlur = 0;
+                    ctx.strokeStyle = '#5a3a3a';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(x + 1, y + 1, CELL_SIZE - 2, CELL_SIZE - 2);
+                }
+
+                // Vẽ thức ăn
+                if (food) {
+                    const fx = food.x * CELL_SIZE;
+                    const fy = food.y * CELL_SIZE;
+                    const gradient = ctx.createRadialGradient(
+                        fx + CELL_SIZE / 2, fy + CELL_SIZE / 2, 2,
+                        fx + CELL_SIZE / 2, fy + CELL_SIZE / 2, CELL_SIZE / 2
+                    );
+                    gradient.addColorStop(0, '#ff6b6b');
+                    gradient.addColorStop(0.7, '#e74c3c');
+                    gradient.addColorStop(1, '#c0392b');
+                    ctx.shadowColor = '#ff6b6b';
+                    ctx.shadowBlur = 12;
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(fx + CELL_SIZE / 2, fy + CELL_SIZE / 2, CELL_SIZE / 2 - 2, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    // Lá
+                    ctx.fillStyle = '#27ae60';
+                    ctx.beginPath();
+                    ctx.arc(fx + CELL_SIZE / 2 + 4, fy + CELL_SIZE / 2 - 4, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Vẽ rắn
+                for (let i = 0; i < snake.length; i++) {
+                    const s = snake[i];
+                    const x = s.x * CELL_SIZE;
+                    const y = s.y * CELL_SIZE;
+                    const padding = i === 0 ? 1 : 2;
+                    const radius = i === 0 ? 4 : 3;
+
+                    // Màu theo vị trí
+                    const ratio = i / snake.length;
+                    const r = Math.floor(30 + 40 * (1 - ratio));
+                    const g = Math.floor(180 - 60 * ratio);
+                    const b = Math.floor(80 + 40 * ratio);
+                    ctx.shadowColor = `rgba(100,255,150,${0.15 + 0.1 * (1 - ratio)})`;
+                    ctx.shadowBlur = i === 0 ? 12 : 6;
+
+                    ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                    ctx.beginPath();
+                    ctx.roundRect(x + padding, y + padding, CELL_SIZE - padding * 2, CELL_SIZE - padding * 2, radius);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+
+                    // Mắt cho đầu
+                    if (i === 0) {
+                        ctx.fillStyle = '#fff';
+                        const eyeOff = 4;
+                        const eyeSize = 3;
+                        let ex1, ey1, ex2, ey2;
+                        if (direction.dx === 1) {
+                            ex1 = x + CELL_SIZE - 6;
+                            ey1 = y + 5;
+                            ex2 = x + CELL_SIZE - 6;
+                            ey2 = y + CELL_SIZE - 5;
+                        } else if (direction.dx === -1) {
+                            ex1 = x + 4;
+                            ey1 = y + 5;
+                            ex2 = x + 4;
+                            ey2 = y + CELL_SIZE - 5;
+                        } else if (direction.dy === -1) {
+                            ex1 = x + 5;
+                            ey1 = y + 4;
+                            ex2 = x + CELL_SIZE - 5;
+                            ey2 = y + 4;
+                        } else {
+                            ex1 = x + 5;
+                            ey1 = y + CELL_SIZE - 6;
+                            ex2 = x + CELL_SIZE - 5;
+                            ey2 = y + CELL_SIZE - 6;
+                        }
+                        ctx.beginPath();
+                        ctx.arc(ex1, ey1, eyeSize, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.beginPath();
+                        ctx.arc(ex2, ey2, eyeSize, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = '#1a2a3a';
+                        ctx.beginPath();
+                        ctx.arc(ex1 + direction.dx * 1.5, ey1 + direction.dy * 1.5, 1.5, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.beginPath();
+                        ctx.arc(ex2 + direction.dx * 1.5, ey2 + direction.dy * 1.5, 1.5, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                // Overlay nếu game over
+                if (gameOver) {
+                    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                    ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+                    ctx.fillStyle = '#f28b82';
+                    ctx.font = 'bold 28px Segoe UI, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('💀 GAME OVER', CANVAS_SIZE / 2, CANVAS_SIZE / 2);
+                } else if (levelCompleted) {
+                    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                    ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+                    ctx.fillStyle = '#6fcf97';
+                    ctx.font = 'bold 28px Segoe UI, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('🎉 HOÀN THÀNH!', CANVAS_SIZE / 2, CANVAS_SIZE / 2);
+                }
+            }
+
+            // roundRect polyfill cho canvas
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+                if (r > w / 2) r = w / 2;
+                if (r > h / 2) r = h / 2;
+                this.moveTo(x + r, y);
+                this.lineTo(x + w - r, y);
+                this.quadraticCurveTo(x + w, y, x + w, y + r);
+                this.lineTo(x + w, y + h - r);
+                this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                this.lineTo(x + r, y + h);
+                this.quadraticCurveTo(x, y + h, x, y + h - r);
+                this.lineTo(x, y + r);
+                this.quadraticCurveTo(x, y, x + r, y);
+                this.closePath();
+                return this;
+            };
+
+            // ============================================================
+            //  UI UPDATE
+            // ============================================================
+            function updateUI() {
+                scoreDisplay.textContent = score;
+                levelDisplay.textContent = currentLevel + 1;
+                // Hiển thị tiến độ táo
+                const progress = `${applesEaten}/${applesNeeded}`;
+                document.querySelector('.stats span:first-child').innerHTML = `
