@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐛 Sâu Ăn Táo - 15 Màn Chơi</title>
+<style>
+  :root{
+    --neon-green:#39ff8f;
+    --neon-pink:#ff3ec9;
+    --neon-blue:#3ec9ff;
+    --neon-yellow:#ffe93e;
+    --neon-purple:#b93eff;
+    --panel-bg:rgba(15,15,35,0.85);
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; min-height:100vh;
+    font-family:'Trebuchet MS','Segoe UI',sans-serif;
+    background: radial-gradient(circle at 20% 20%, #2b0b4e, #0a0a1a 60%),
+                radial-gradient(circle at 80% 80%, #001f3f, #0a0a1a 70%);
+    background-blend-mode:screen;
+    color:#fff; display:flex; flex-direction:column; align-items:center;
+    overflow-x:hidden; position:relative;
+  }
+  .stars, .stars2{ position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; }
+  .stars{
+    background-image: radial-gradient(2px 2px at 20px 30px,#fff,transparent),
+                       radial-gradient(2px 2px at 90px 120px,#fff,transparent),
+                       radial-gradient(1px 1px at 160px 60px,#fff,transparent);
+    background-size:250px 250px; animation:drift 60s linear infinite; opacity:.6;
+  }
+  .stars2{
+    background-image: radial-gradient(1.5px 1.5px at 50px 80px,var(--neon-pink),transparent),
+                       radial-gradient(1.5px 1.5px at 140px 30px,var(--neon-blue),transparent),
+                       radial-gradient(1.5px 1.5px at 190px 150px,var(--neon-yellow),transparent);
+    background-size:300px 300px; animation:drift 90s linear infinite reverse; opacity:.5;
+  }
+  @keyframes drift{ from{background-position:0 0;} to{background-position:1000px 1000px;} }
+
+  h1{
+    z-index:1; margin:20px 0 4px; font-size:2.2em; text-align:center;
+    background:linear-gradient(90deg,var(--neon-green),var(--neon-blue),var(--neon-pink),var(--neon-yellow));
+    background-size:300% 300%; -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:hue 6s ease infinite; text-shadow:0 0 25px rgba(255,255,255,.15);
+  }
+  @keyframes hue{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
+  .subtitle{ z-index:1; color:var(--neon-blue); margin-bottom:16px; text-shadow:0 0 8px var(--neon-blue); font-weight:bold; text-align:center; padding:0 10px;}
+
+  .screen{ z-index:1; width:100%; max-width:520px; padding:0 14px; display:flex; flex-direction:column; align-items:center; }
+  .hidden{ display:none !important; }
+  .panel{
+    background:var(--panel-bg); border:2px solid var(--neon-purple); border-radius:16px;
+    box-shadow:0 0 25px rgba(185,62,255,.5), inset 0 0 20px rgba(185,62,255,.1);
+    padding:20px; width:100%;
+  }
+  button{ cursor:pointer; border:none; border-radius:10px; font-weight:bold; font-family:inherit; transition:transform .15s ease, box-shadow .15s ease; }
+  button:active{ transform:scale(.95); }
+  button:disabled{ cursor:not-allowed; }
+
+  .btn-main{ display:block; width:100%; padding:14px; margin:8px 0; font-size:1.05em; color:#0a0a1a;
+    background:linear-gradient(90deg,var(--neon-green),var(--neon-blue)); box-shadow:0 0 14px var(--neon-green); }
+  .btn-secondary{ padding:10px 16px; margin:4px; background:linear-gradient(90deg,var(--neon-pink),var(--neon-purple)); color:#fff; box-shadow:0 0 10px var(--neon-pink); }
+
+  #levelGrid{ display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin:14px 0; }
+  .level-btn{ aspect-ratio:1/1; font-size:1.15em; color:#0a0a1a;
+    background:linear-gradient(135deg,var(--neon-yellow),var(--neon-green)); box-shadow:0 0 10px var(--neon-yellow); position:relative; }
+  .level-btn.done::after{ content:"★"; position:absolute; top:-6px; right:-4px; font-size:.8em; color:var(--neon-pink); text-shadow:0 0 6px var(--neon-pink); }
+  .level-btn.locked{ background:#2a2a3d; color:#666; box-shadow:none; }
+  .level-btn.current{ outline:3px solid var(--neon-pink); }
+
+  .hud{ display:flex; justify-content:space-between; width:100%; max-width:440px; margin-bottom:8px; flex-wrap:wrap; gap:4px 14px; font-size:1em; }
+  .hud span{ font-weight:bold; }
+  #hudLevel{ color:var(--neon-yellow); text-shadow:0 0 6px var(--neon-yellow); }
+  #hudApples{ color:var(--neon-pink); text-shadow:0 0 6px var(--neon-pink); }
+  #hudMoves{ color:var(--neon-blue); text-shadow:0 0 6px var(--neon-blue); }
+
+  #boardWrap{ background:#0d0d1f; border:3px solid var(--neon-blue); border-radius:10px; box-shadow:0 0 25px rgba(62,201,255,.6); padding:6px; max-width:100%; overflow:auto; }
+  canvas{ display:block; }
+
+  #dpad{ display:grid; grid-template-columns:56px 56px 56px; grid-template-rows:56px 56px 56px; gap:6px; margin-top:14px; }
+  #dpad button{ background:linear-gradient(135deg,var(--neon-blue),var(--neon-purple)); color:#fff; font-size:1.3em; box-shadow:0 0 8px var(--neon-blue); }
+  #up{ grid-column:2; grid-row:1; } #left{ grid-column:1; grid-row:2; } #right{ grid-column:3; grid-row:2; } #down{ grid-column:2; grid-row:3; }
+
+  .controls-row{ display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; justify-content:center; }
+
+  .msg-title{ font-size:1.6em; text-align:center; margin-bottom:6px; }
+  .win .msg-title{ color:var(--neon-green); text-shadow:0 0 12px var(--neon-green); }
+  .lose .msg-title{ color:var(--neon-pink); text-shadow:0 0 12px var(--neon-pink); }
+  .hint{ color:var(--neon-yellow); text-shadow:0 0 6px var(--neon-yellow); text-align:center; font-size:.88em; margin-top:6px; }
+  footer{ z-index:1; margin:26px 0 14px; color:#8888aa; font-size:.8em; text-align:center; }
+</style>
+</head>
+<body>
+
+<div class="stars"></div>
+<div class="stars2"></div>
+
+<h1>🐛 Sâu Ăn Táo 🍎</h1>
+<div class="subtitle">15 màn chơi kiểu "Apple Worm" — từ dễ đến khó, màn nào cũng có cách giải!</div>
+
+<!-- MENU -->
+<div id="menuScreen" class="screen">
+  <div class="panel">
+    <button class="btn-main" id="playBtn">▶ Chơi tiếp (Màn <span id="continueLevel">1</span>)</button>
+    <button class="btn-main" id="levelSelectBtn">🗺 Chọn màn chơi</button>
+    <button class="btn-main" id="resetBtn" style="background:linear-gradient(90deg,#ff3ec9,#ff7a3e);">♻ Chơi lại từ đầu</button>
+  </div>
+</div>
+
+<!-- LEVEL SELECT -->
+<div id="levelSelectScreen" class="screen hidden">
+  <div class="panel">
+    <h2 style="text-align:center; color:var(--neon-blue); text-shadow:0 0 8px var(--neon-blue);">Chọn màn chơi</h2>
+    <p class="hint">🔒 Chỉ quay lại được màn <b>đã chơi</b>. Màn chưa mở khoá sẽ bị khoá.</p>
+    <div id="levelGrid"></div>
+    <button class="btn-secondary" id="backToMenuFromSelect">⬅ Quay lại Menu</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="gameScreen" class="screen hidden">
+  <div class="hud">
+    <span>Màn: <span id="hudLevel">1</span></span>
+    <span>Táo còn lại: <span id="hudApples">0</span></span>
+    <span>Lượt đi: <span id="hudMoves">0</span></span>
+  </div>
+  <div id="boardWrap"><canvas id="board"></canvas></div>
+  <div id="dpad">
+    <button id="up">▲</button>
+    <button id="left">◀</button>
+    <button id="right">▶</button>
+    <button id="down">▼</button>
+  </div>
+  <div class="controls-row">
+    <button class="btn-secondary" id="undoBtn">↩ Hoàn tác</button>
+    <button class="btn-secondary" id="retryBtn">🔁 Chơi lại</button>
+    <button class="btn-secondary" id="backToSelectFromGame">🗺 Chọn màn</button>
+    <button class="btn-secondary" id="backToMenuFromGame">🏠 Menu</button>
+  </div>
+  <p class="hint">Dẫn sâu đi theo đường gạch để ăn hết táo trước khi hết lượt đi!</p>
+</div>
+
+<!-- END OVERLAY -->
+<div id="endOverlay" class="screen hidden" style="position:fixed; top:0; left:0; height:100%; justify-content:center; background:rgba(0,0,0,0.65); backdrop-filter:blur(2px);">
+  <div class="panel" id="endPanel" style="max-width:380px;">
+    <div class="msg-title" id="endTitle">🎉 Hoàn thành!</div>
+    <p id="endText" style="text-align:center;"></p>
+    <button class="btn-main" id="endNextBtn">➡ Màn tiếp theo</button>
+    <button class="btn-secondary" id="endRetryBtn" style="width:100%; margin-top:6px;">🔁 Chơi lại màn này</button>
+    <button class="btn-secondary" id="endSelectBtn" style="width:100%;">🗺 Chọn màn</button>
+  </div>
+</div>
+
+<footer>Làm bằng HTML/CSS/JS • Có thể deploy miễn phí trên GitHub Pages</footer>
+
+<script>
+/* ============ SỐ MÀN ============ */
+const TOTAL_LEVELS = 15;
+const CELL = 30; // px
+
+/* ============ PRNG có seed (để màn chơi luôn cố định, không đổi mỗi lần tải) ============ */
+function mulberry32(seed){
+  return function(){
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/* ============ SINH MÀN CHƠI: một con đường gạch (block) uốn lượn,
+   sâu chỉ có thể đi trên gạch. Vì lời giải luôn là "đi dọc theo đường"
+   nên MÀN NÀO CŨNG CÓ CÁCH GIẢI. Độ khó tăng theo: đường dài hơn,
+   nhiều táo hơn, và ít lượt đi dư hơn. ============ */
+function generateLevel(levelNum){
+  const rng = mulberry32(9000 + levelNum * 131);
+  const cols = 8 + Math.min(6, Math.floor(levelNum/2));   // 8..14
+  const rows = 8 + Math.min(6, Math.floor(levelNum/2));   // 8..14
+  const pathLen = 10 + levelNum * 3;                       // độ dài đường đi
+
+  const dirs = [{x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}];
+  const visited = new Set();
+  let x = Math.floor(cols/2), y = 1;
+  let path = [{x,y}];
+  visited.add(x+','+y);
+  let lastDir = null;
+
+  for(let i=0;i<pathLen;i++){
+    // ưu tiên: tiếp tục thẳng đôi lúc, rẽ đôi lúc, để trông giống cầu thang trong ảnh
+    let candidates = dirs.filter(d=>{
+      const nx=x+d.x, ny=y+d.y;
+      if(nx<0||ny<0||nx>=cols||ny>=rows) return false;
+      if(visited.has(nx+','+ny)) return false;
+      if(lastDir && d.x===-lastDir.x && d.y===-lastDir.y) return false; // không quay đầu 180 độ
+      return true;
+    });
+    if(candidates.length===0) break;
+    let chosen;
+    if(lastDir && candidates.some(d=>d.x===lastDir.x&&d.y===lastDir.y) && rng() < 0.55){
+      chosen = lastDir; // giữ hướng thẳng để tạo bậc thang dài
+    } else {
+      chosen = candidates[Math.floor(rng()*candidates.length)];
+    }
+    x += chosen.x; y += chosen.y;
+    path.push({x,y});
+    visited.add(x+','+y);
+    lastDir = chosen;
+  }
+
+  const blocks = new Set(path.map(p=>p.x+','+p.y));
+
+  // đặt táo dọc đường đi (không đặt ở ô xuất phát)
+  const appleEvery = Math.max(2, 4 - Math.floor(levelNum/5));
+  const apples = [];
+  for(let i=appleEvery;i<path.length;i+=appleEvery){
+    apples.push({x:path[i].x, y:path[i].y});
+  }
+  if(apples.length===0 && path.length>1){
+    apples.push({x:path[path.length-1].x, y:path[path.length-1].y});
+  }
+
+  const slack = Math.max(2, 10 - levelNum); // lượt dư giảm dần theo độ khó
+  const movesLimit = (path.length - 1) + slack;
+
+  return {
+    cols, rows,
+    blocks,
+    apples,
+    start: {x: path[0].x, y: path[0].y},
+    movesLimit
+  };
+}
+
+/* ============ TIẾN TRÌNH LƯU TRÊN TRÌNH DUYỆT ============ */
+const SAVE_KEY = 'appleWormProgress_v1';
+function loadProgress(){
+  try{ const raw = localStorage.getItem(SAVE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  return { unlocked:1, completed:[], played:[1] };
+}
+function saveProgress(p){ localStorage.setItem(SAVE_KEY, JSON.stringify(p)); }
+let progress = loadProgress();
+
+/* ============ ĐIỀU HƯỚNG MÀN HÌNH ============ */
+const screens = { menu:document.getElementById('menuScreen'), select:document.getElementById('levelSelectScreen'), game:document.getElementById('gameScreen') };
+function showScreen(name){
+  Object.values(screens).forEach(s=>s.classList.add('hidden'));
+  screens[name].classList.remove('hidden');
+  document.getElementById('endOverlay').classList.add('hidden');
+}
+document.getElementById('continueLevel').textContent = progress.unlocked;
+document.getElementById('playBtn').onclick = () => startLevel(progress.unlocked);
+document.getElementById('levelSelectBtn').onclick = () => { renderLevelGrid(); showScreen('select'); };
+document.getElementById('backToMenuFromSelect').onclick = () => showScreen('menu');
+document.getElementById('backToMenuFromGame').onclick = () => { showScreen('menu'); document.getElementById('continueLevel').textContent = progress.unlocked; };
+document.getElementById('backToSelectFromGame').onclick = () => { renderLevelGrid(); showScreen('select'); };
+document.getElementById('resetBtn').onclick = () => {
+  if(confirm('Xoá toàn bộ tiến trình và chơi lại từ Màn 1?')){
+    progress = { unlocked:1, completed:[], played:[1] };
+    saveProgress(progress);
+    document.getElementById('continueLevel').textContent = 1;
+  }
+};
+
+function renderLevelGrid(){
+  const grid = document.getElementById('levelGrid');
+  grid.innerHTML = '';
+  for(let i=1;i<=TOTAL_LEVELS;i++){
+    const btn = document.createElement('button');
+    btn.className = 'level-btn';
+    btn.textContent = i;
+    const played = progress.played.includes(i);
+    const completed = progress.completed.includes(i);
+    if(completed) btn.classList.add('done');
+    if(i === progress.unlocked) btn.classList.add('current');
+    if(!played){
+      // CHỈ quay lại được màn ĐÃ CHƠI - màn chưa từng chơi bị khoá
+      btn.classList.add('locked');
+      btn.textContent = '🔒';
+      btn.disabled = true;
+    } else {
+      btn.onclick = () => startLevel(i);
+    }
+    grid.appendChild(btn);
+  }
+}
+
+/* ============ LOGIC GAME "SÂU ĂN TÁO" ============ */
+const canvas = document.getElementById('board');
+const ctx = canvas.getContext('2d');
+let level, worm, apples, movesLeft, curLevel, history;
+
+function startLevel(levelNum){
+  curLevel = levelNum;
+  level = generateLevel(levelNum);
+  worm = [ {x:level.start.x, y:level.start.y} ]; // đầu sâu, dài dần khi ăn táo
+  apples = level.apples.map(a=>({...a}));
+  movesLeft = level.movesLimit;
+  history = [];
+
+  if(!progress.played.includes(levelNum)){ progress.played.push(levelNum); saveProgress(progress); }
+
+  canvas.width = level.cols * CELL;
+  canvas.height = level.rows * CELL;
+
+  document.getElementById('hudLevel').textContent = levelNum;
+  document.getElementById('hudApples').textContent = apples.length;
+  document.getElementById('hudMoves').textContent = movesLeft;
+
+  draw();
+  showScreen('game');
+}
+
+function cellKey(x,y){ return x+','+y; }
+
+function tryMove(dx,dy){
+  if(movesLeft<=0) return;
+  const head = worm[0];
+  const nx = head.x+dx, ny = head.y+dy;
+
+  if(!level.blocks.has(cellKey(nx,ny))) return; // không có gạch -> không đi được (rơi)
+  // không cho đi vào thân mình (trừ khi đó là ô đuôi sắp rời đi và sâu chưa ăn táo ở bước này)
+  const willEatIndex = apples.findIndex(a=>a.x===nx && a.y===ny);
+  const bodyToCheck = willEatIndex>=0 ? worm : worm.slice(0,-1);
+  if(bodyToCheck.some(s=>s.x===nx && s.y===ny)) return;
+
+  // lưu lịch sử để Hoàn tác
+  history.push({ worm: worm.map(s=>({...s})), apples: apples.map(a=>({...a})), movesLeft });
+
+  worm.unshift({x:nx,y:ny});
+  if(willEatIndex>=0){
+    apples.splice(willEatIndex,1);
+  } else {
+    worm.pop();
+  }
+  movesLeft--;
+
+  document.getElementById('hudApples').textContent = apples.length;
+  document.getElementById('hudMoves').textContent = movesLeft;
+  draw();
+
+  if(apples.length===0){ setTimeout(()=>showEnd(true), 150); return; }
+  if(movesLeft<=0){ setTimeout(()=>showEnd(false), 150); return; }
+}
+
+document.getElementById('undoBtn').onclick = () => {
+  if(history.length===0) return;
+  const h = history.pop();
+  worm = h.worm; apples = h.apples; movesLeft = h.movesLeft;
+  document.getElementById('hudApples').textContent = apples.length;
+  document.getElementById('hudMoves').textContent = movesLeft;
+  draw();
+};
+document.getElementById('retryBtn').onclick = () => startLevel(curLevel);
+
+/* ============ VẼ BÀN CHƠI (khối 3D kiểu ảnh mẫu) ============ */
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // các khối gạch
+  level.blocks.forEach(key=>{
+    const [x,y] = key.split(',').map(Number);
+    const px = x*CELL, py = y*CELL;
+    // mặt trên
+    ctx.fillStyle = (x+y)%2===0 ? '#e8a33e' : '#f0b355';
+    ctx.fillRect(px, py, CELL, CELL-6);
+    // cạnh dưới (hiệu ứng khối 3D nâu)
+    ctx.fillStyle = '#5a3a1e';
+    ctx.fillRect(px, py+CELL-6, CELL, 6);
+    ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+    ctx.strokeRect(px+0.5, py+0.5, CELL-1, CELL-1);
+  });
+
+  // táo
+  apples.forEach(a=>{
+    const cx = a.x*CELL+CELL/2, cy = a.y*CELL+(CELL-6)/2;
+    ctx.fillStyle = '#e8344a';
+    ctx.shadowColor = '#ff3ec9'; ctx.shadowBlur = 8;
+    ctx.beginPath(); ctx.arc(cx, cy+2, CELL*0.28, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = '#3a6b1e'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(cx, cy-CELL*0.22); ctx.lineTo(cx+3, cy-CELL*0.34); ctx.stroke();
+  });
+
+  // sâu
+  worm.forEach((s,i)=>{
+    const px = s.x*CELL+CELL/2, py = s.y*CELL+(CELL-6)/2;
+    ctx.fillStyle = i===0 ? '#39ff8f' : '#22cc6f';
+    ctx.shadowColor = '#39ff8f'; ctx.shadowBlur = i===0?10:3;
+    ctx.beginPath(); ctx.arc(px, py, CELL*0.34, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur = 0;
+    if(i===0){
+      ctx.fillStyle = '#111';
+      ctx.beginPath(); ctx.arc(px-4, py-3, 2.2, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(px+4, py-3, 2.2, 0, Math.PI*2); ctx.fill();
+    }
+  });
+}
+
+/* ============ ĐIỀU KHIỂN ============ */
+document.addEventListener('keydown', e=>{
+  if(screens.game.classList.contains('hidden')) return;
+  const k = e.key.toLowerCase();
+  if(k==='arrowup'||k==='w') tryMove(0,-1);
+  else if(k==='arrowdown'||k==='s') tryMove(0,1);
+  else if(k==='arrowleft'||k==='a') tryMove(-1,0);
+  else if(k==='arrowright'||k==='d') tryMove(1,0);
+});
+document.getElementById('up').onclick = () => tryMove(0,-1);
+document.getElementById('down').onclick = () => tryMove(0,1);
+document.getElementById('left').onclick = () => tryMove(-1,0);
+document.getElementById('right').onclick = () => tryMove(1,0);
+
+let touchStart=null;
+canvas.addEventListener('touchstart', e=>{ touchStart=e.touches[0]; }, {passive:true});
+canvas.addEventListener('touchend', e=>{
+  if(!touchStart) return;
+  const dx = e.changedTouches[0].clientX-touchStart.clientX;
+  const dy = e.changedTouches[0].clientY-touchStart.clientY;
+  if(Math.max(Math.abs(dx),Math.abs(dy)) > 15){
+    if(Math.abs(dx)>Math.abs(dy)) tryMove(dx>0?1:-1,0);
+    else tryMove(0, dy>0?1:-1);
+  }
+  touchStart=null;
+}, {passive:true});
+
+/* ============ KẾT THÚC MÀN ============ */
+function showEnd(won){
+  const overlay = document.getElementById('endOverlay');
+  const panel = document.getElementById('endPanel');
+  const title = document.getElementById('endTitle');
+  const text = document.getElementById('endText');
+  const nextBtn = document.getElementById('endNextBtn');
+
+  overlay.classList.remove('hidden');
+  overlay.style.display = 'flex';
+
+  if(won){
+    panel.parentElement.classList.add('win'); panel.parentElement.classList.remove('lose');
+    title.textContent = '🎉 Qua màn ' + curLevel + '!';
+    text.textContent = `Sâu đã ăn hết táo, còn dư ${movesLeft} lượt đi!`;
+
+    if(!progress.completed.includes(curLevel)) progress.completed.push(curLevel);
+    if(curLevel === progress.unlocked && curLevel < TOTAL_LEVELS) progress.unlocked = curLevel+1;
+    saveProgress(progress);
+
+    if(curLevel < TOTAL_LEVELS){
+      nextBtn.classList.remove('hidden');
+      nextBtn.textContent = '➡ Màn ' + (curLevel+1);
+      nextBtn.onclick = () => {
+        if(!progress.played.includes(curLevel+1)){ progress.played.push(curLevel+1); saveProgress(progress); }
+        startLevel(curLevel+1);
+      };
+    } else {
+      nextBtn.classList.add('hidden');
+      text.textContent += ' 🏆 Bạn đã hoàn thành TẤT CẢ 15 màn chơi!';
+    }
+  } else {
+    panel.parentElement.classList.add('lose'); panel.parentElement.classList.remove('win');
+    title.textContent = '😵 Hết lượt đi!';
+    text.textContent = `Còn ${apples.length} quả táo chưa ăn ở màn ${curLevel}. Thử lại nhé!`;
+    nextBtn.classList.add('hidden');
+  }
+}
+document.getElementById('endRetryBtn').onclick = () => startLevel(curLevel);
+document.getElementById('endSelectBtn').onclick = () => { renderLevelGrid(); showScreen('select'); document.getElementById('endOverlay').classList.add('hidden'); };
+
+/* ============ KHỞI ĐỘNG ============ */
+showScreen('menu');
+</script>
+</body>
+</html>
