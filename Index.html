@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link4M Bypass Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f0f1a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #e0e0e0;
+        }
+        .container {
+            background: #1a1a2e;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            width: 90%;
+            max-width: 700px;
+            border: 1px solid #2a2a4a;
+        }
+        h1 {
+            font-size: 1.8rem;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #00d2ff, #7a5cff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+        .subtitle {
+            text-align: center;
+            color: #8888aa;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #2a2a4a;
+            padding-bottom: 1rem;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+        .input-group input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid #2a2a4a;
+            border-radius: 12px;
+            background: #12122a;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .input-group input:focus {
+            border-color: #7a5cff;
+            box-shadow: 0 0 20px rgba(122, 92, 255, 0.2);
+        }
+        .input-group input::placeholder {
+            color: #555577;
+        }
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, #7a5cff, #00d2ff);
+            color: #fff;
+            white-space: nowrap;
+        }
+        .btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 30px rgba(122, 92, 255, 0.4);
+        }
+        .btn:active {
+            transform: scale(0.97);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result-box {
+            background: #12122a;
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-top: 1.5rem;
+            border: 1px solid #2a2a4a;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            word-break: break-all;
+            position: relative;
+        }
+        .result-box .label {
+            color: #8888aa;
+            font-size: 0.8rem;
+            position: absolute;
+            top: -10px;
+            left: 16px;
+            background: #1a1a2e;
+            padding: 0 10px;
+        }
+        .result-box .url-display {
+            color: #b0b0ff;
+            font-size: 0.95rem;
+            padding-right: 50px;
+        }
+        .copy-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #2a2a4a;
+            border: none;
+            color: #aaaacc;
+            padding: 6px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: 0.2s;
+        }
+        .copy-btn:hover {
+            background: #3a3a5a;
+            color: #fff;
+        }
+        .status {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #8888aa;
+            text-align: center;
+            min-height: 24px;
+        }
+        .status.success {
+            color: #6fcf97;
+        }
+        .status.error {
+            color: #f28b82;
+        }
+        .history {
+            margin-top: 2rem;
+            border-top: 1px solid #2a2a4a;
+            padding-top: 1.2rem;
+        }
+        .history h3 {
+            font-size: 0.9rem;
+            color: #8888aa;
+            margin-bottom: 0.8rem;
+        }
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            padding: 6px 0;
+            border-bottom: 1px solid #1a1a2e;
+            color: #9999bb;
+        }
+        .history-item .h-url {
+            color: #b0b0ff;
+            max-width: 70%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .history-item .h-time {
+            color: #666688;
+            font-size: 0.7rem;
+        }
+        .clear-history {
+            background: none;
+            border: none;
+            color: #555577;
+            cursor: pointer;
+            font-size: 0.75rem;
+            float: right;
+            margin-top: -6px;
+        }
+        .clear-history:hover {
+            color: #f28b82;
+        }
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #2a2a4a;
+            border-top-color: #7a5cff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #333355;
+        }
+        .badge {
+            display: inline-block;
+            background: #2a2a4a;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            color: #7777aa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔓 Link4M Bypass</h1>
+        <div class="subtitle">Giải nén link rút gọn · Không cần xem quảng cáo</div>
+
+        <div class="input-group">
+            <input type="text" id="inputUrl" placeholder="https://link4m.net/..." value="">
+            <button class="btn" id="bypassBtn">⚡ Bypass</button>
+        </div>
+
+        <div class="result-box" id="resultBox">
+            <span class="label">🔗 Kết quả</span>
+            <span class="url-display" id="resultDisplay">Nhập link và nhấn Bypass</span>
+            <button class="copy-btn" id="copyBtn">Sao chép</button>
+        </div>
+
+        <div class="status" id="status">Sẵn sàng</div>
+
+        <div class="history">
+            <h3>📋 Lịch sử <button class="clear-history" id="clearHistory">Xóa</button></h3>
+            <div id="historyList"></div>
+        </div>
+
+        <div class="footer">
+            <span class="badge">⚡ bypass v1.0</span> · <span class="badge">Không lưu log</span>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ---- DOM refs ----
+            const inputUrl = document.getElementById('inputUrl');
+            const bypassBtn = document.getElementById('bypassBtn');
+            const resultDisplay = document.getElementById('resultDisplay');
+            const statusEl = document.getElementById('status');
+            const copyBtn = document.getElementById('copyBtn');
+            const historyList = document.getElementById('historyList');
+            const clearHistoryBtn = document.getElementById('clearHistory');
+
+            // ---- State ----
+            const HISTORY_KEY = 'link4m_history';
+            let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+
+            // ---- Utility ----
+            function saveHistory() {
+                localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+                renderHistory();
+            }
+
+            function addHistory(original, resolved) {
+                history.unshift({
+                    original: original,
+                    resolved: resolved,
+                    time: new Date().toLocaleString()
+                });
+                if (history.length > 50) history.pop();
+                saveHistory();
+            }
+
+            function renderHistory() {
+                if (!historyList) return;
+                if (history.length === 0) {
+                    historyList.innerHTML = '<div style="color:#444466;font-size:0.8rem;padding:6px 0;">Chưa có link nào</div>';
+                    return;
+                }
+                let html = '';
+                history.forEach(item => {
+                    html += `
+                        <div class="history-item">
+                            <span class="h-url" title="${escapeHtml(item.original)}">${escapeHtml(item.original)}</span>
+                            <span class="h-time">${escapeHtml(item.time)}</span>
+                        </div>
+                    `;
+                });
+                historyList.innerHTML = html;
+            }
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            // ---- CORE BYPASS ENGINE ----
+            function extractLink4MId(url) {
+                // Match các dạng: https://link4m.net/xxx hoặc link4m.net/xxx?...
+                const match = url.match(/link4m\.net\/([a-zA-Z0-9]+)/);
+                return match ? match[1] : null;
+            }
+
+            function buildApiUrl(shortId) {
+                // Sử dụng dịch vụ redirect tracker (thực tế phải gửi request lấy header Location)
+                // Ở đây dùng 1 API middleware giả lập (không chính thức)
+                // Để bypass thật cần sử dụng proxy + request tới link4m và lấy redirect
+                // Hoặc sử dụng các API có sẵn như: https://api.bypass.vip/
+                // Đây là demo sử dụng API bypass công khai
+                return `https://api.bypass.vip/api/v1/bypass?url=https://link4m.net/${shortId}`;
+            }
+
+            async function bypassLink4M(link) {
+                const shortId = extractLink4MId(link);
+                if (!shortId) {
+                    throw new Error('Không tìm thấy ID link4m.net');
+                }
+
+                // Cách 1: Gọi API bypass (khuyến nghị dùng proxy riêng)
+                // Cách này sử dụng API công khai (có thể bị chặn hoặc hạn chế)
+                const apiUrl = `https://api.bypass.vip/api/v1/bypass?url=https://link4m.net/${shortId}`;
+                const response = await fetch(apiUrl, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                if (data.success && data.destination) {
+                    return data.destination;
+                } else {
+                    throw new Error(data.message || 'Không thể bypass link');
+                }
+            }
+
+            // ---- Alternative: Direct fetch + follow redirect (simulate) ----
+            // Vì CORS nên không thể fetch trực tiếp link4m từ browser
+            // Cần proxy hoặc API backend, ở đây demo dùng API bypass.vip
+
+            // ---- UI Handlers ----
+            async function handleBypass() {
+                const rawUrl = inputUrl.value.trim();
+                if (!rawUrl) {
+                    setStatus('Vui lòng nhập link link4m.net', 'error');
+                    return;
+                }
+
+                // Validate format
+                if (!rawUrl.includes('link4m.net')) {
+                    setStatus('Link không hợp lệ. Phải chứa link4m.net', 'error');
+                    return;
+                }
+
+                // Disable button, show loading
+                bypassBtn.disabled = true;
+                bypassBtn.innerHTML = '<span class="spinner"></span> Đang xử lý';
+                setStatus('Đang giải nén...', '');
+
+                try {
+                    const resolved = await bypassLink4M(rawUrl);
+                    resultDisplay.textContent = resolved;
+                    setStatus('✅ Bypass thành công!', 'success');
+                    addHistory(rawUrl, resolved);
+
+                    // Auto copy?
+                    // Copy only if user wants (we'll let them click copy)
+
+                } catch (err) {
+                    console.error(err);
+                    resultDisplay.textContent = '❌ ' + err.message;
+                    setStatus('Lỗi: ' + err.message, 'error');
+                } finally {
+                    bypassBtn.disabled = false;
+                    bypassBtn.innerHTML = '⚡ Bypass';
+                }
+            }
+
+            function setStatus(msg, type) {
+                statusEl.textContent = msg;
+                statusEl.className = 'status' + (type ? ' ' + type : '');
+            }
+
+            function copyResult() {
+                const text = resultDisplay.textContent;
+                if (!text || text.includes('Nhập link')) {
+                    setStatus('Không có gì để sao chép', 'error');
+                    return;
+                }
+                navigator.clipboard.writeText(text).then(() => {
+                    setStatus('✅ Đã sao chép vào clipboard', 'success');
+                }).catch(() => {
+                    // Fallback
+                    const range = document.createRange();
+                    const selection = window.getSelection();
+                    range.selectNodeContents(resultDisplay);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                    document.execCommand('copy');
+                    setStatus('✅ Đã sao chép (fallback)', 'success');
+                });
+            }
+
+            function clearHistory() {
+                history = [];
+                saveHistory();
+                setStatus('Đã xóa lịch sử', '');
+            }
+
+            // ---- Event binding ----
+            bypassBtn.addEventListener('click', handleBypass);
+            copyBtn.addEventListener('click', copyResult);
+            clearHistoryBtn.addEventListener('click', clearHistory);
+
+            // Enter key
+            inputUrl.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleBypass();
+                }
+            });
+
+            // Paste từ clipboard
+            inputUrl.addEventListener('paste', (e) => {
+                // optional: trim whitespace
+                setTimeout(() => {
+                    inputUrl.value = inputUrl.value.trim();
+                }, 50);
+            });
+
+            // ---- Init ----
+            renderHistory();
+            setStatus('Sẵn sàng', '');
+
+            // Demo auto-fill (remove later)
+            if (!inputUrl.value) {
+                inputUrl.placeholder = 'https://link4m.net/yourID';
+            }
+
+            console.log('🔓 Link4M Bypass Tool ready');
+            console.log('⚠️  Sử dụng API bypass.vip - có thể không ổn định');
+            console.log('💡 Để bypass ổn định hơn, cần tự host proxy server');
+
+        })();
+    </script>
+</body>
+  </html>
