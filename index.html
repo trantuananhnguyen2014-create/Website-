@@ -311,7 +311,7 @@
         <div class="header">
             <h1>🐍 RẮN ĂN TÁO</h1>
             <div class="stats">
-                <span>🍎 <span class="score" id="scoreDisplay">0</span></span>
+                <span>🍎 <span class="score" id="scoreDisplay">0/0</span></span>
                 <span>📦 Màn <span class="level" id="levelDisplay">1</span>/15</span>
             </div>
         </div>
@@ -507,7 +507,7 @@
             // ============================================================
             //  STATE
             // ============================================================
-            let currentLevel = 0; // 0-based
+            let currentLevel = 0;
             let snake = [];
             let direction = { dx: 1, dy: 0 };
             let nextDirection = { dx: 1, dy: 0 };
@@ -521,8 +521,8 @@
             let gameOver = false;
             let levelCompleted = false;
             let gameLoopInterval = null;
-            let speed = 150; // ms
-            let unlockedLevels = [true]; // màn 1 luôn mở
+            let speed = 150;
+            let unlockedLevels = [true];
             let completedLevels = [];
 
             // DOM refs
@@ -548,9 +548,9 @@
                 };
             }
 
-            function isValidCell(x, y, snakePositions, wallsPos) {
+            function isValidCell(x, y, snakePos, wallsPos) {
                 if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) return false;
-                for (let s of snakePositions) {
+                for (let s of snakePos) {
                     if (s.x === x && s.y === y) return false;
                 }
                 for (let w of wallsPos) {
@@ -580,7 +580,6 @@
                 applesNeeded = config.applesNeeded;
                 walls = config.walls.map(w => ({ ...w }));
 
-                // Snake: bắt đầu ở giữa, dài 3
                 const mid = Math.floor(GRID_SIZE / 2);
                 snake = [
                     { x: mid, y: mid },
@@ -595,10 +594,8 @@
                 levelCompleted = false;
                 gamePaused = false;
 
-                // Tạo thức ăn
                 food = generateFood(snake, walls);
                 if (!food) {
-                    // Nếu không có chỗ, thử đặt ở vị trí cố định
                     food = { x: 5, y: 5 };
                     if (!isValidCell(5, 5, snake, walls)) {
                         food = { x: 10, y: 10 };
@@ -626,9 +623,7 @@
             function startGame() {
                 if (gameRunning && !gamePaused) return;
                 if (gameOver || levelCompleted) {
-                    // Reset nếu game over hoặc đã hoàn thành
                     initLevel(currentLevel);
-                    // Sau đó start
                     setTimeout(() => startGame(), 50);
                     return;
                 }
@@ -683,24 +678,20 @@
             function update() {
                 if (gameOver || levelCompleted) return;
 
-                // Cập nhật hướng
                 direction = { ...nextDirection };
 
-                // Tính đầu mới
                 const head = snake[0];
                 const newHead = {
                     x: head.x + direction.dx,
                     y: head.y + direction.dy,
                 };
 
-                // Kiểm tra va chạm tường biên
                 if (newHead.x < 0 || newHead.x >= GRID_SIZE || newHead.y < 0 || newHead.y >= GRID_SIZE) {
                     gameOver = true;
                     endGame('Bạn đã đâm vào tường! 💥');
                     return;
                 }
 
-                // Kiểm tra va chạm tường (chướng ngại vật)
                 for (let w of walls) {
                     if (w.x === newHead.x && w.y === newHead.y) {
                         gameOver = true;
@@ -709,46 +700,38 @@
                     }
                 }
 
-                // Kiểm tra va chạm với thân (trừ đuôi nếu không ăn)
                 const willEat = food && newHead.x === food.x && newHead.y === food.y;
                 let tail = null;
                 if (!willEat) {
                     tail = snake.pop();
                 }
 
-                // Kiểm tra va chạm với thân
                 for (let s of snake) {
                     if (s.x === newHead.x && s.y === newHead.y) {
                         gameOver = true;
-                        if (tail) snake.push(tail); // restore
+                        if (tail) snake.push(tail);
                         endGame('Rắn đã cắn vào thân! 🔄');
                         return;
                     }
                 }
 
-                // Thêm đầu mới
                 snake.unshift(newHead);
 
-                // Xử lý ăn táo
                 if (willEat) {
                     applesEaten++;
                     score += 10;
-                    // Tạo thức ăn mới
                     food = generateFood(snake, walls);
                     if (!food) {
-                        // Nếu không còn chỗ, kiểm tra thắng
                         if (applesEaten >= applesNeeded) {
                             levelCompleted = true;
                             completeLevel();
                             return;
                         }
-                        // Nếu chưa đủ táo mà hết chỗ => game over (kẹt)
                         gameOver = true;
                         endGame('Không còn chỗ cho táo! 😵');
                         return;
                     }
 
-                    // Kiểm tra thắng
                     if (applesEaten >= applesNeeded) {
                         levelCompleted = true;
                         completeLevel();
@@ -783,7 +766,6 @@
                     gameLoopInterval = null;
                 }
 
-                // Mở khóa màn tiếp theo nếu chưa
                 if (currentLevel + 1 < LEVELS.length && !unlockedLevels[currentLevel + 1]) {
                     unlockedLevels[currentLevel + 1] = true;
                 }
@@ -793,6 +775,7 @@
                 updateLevelBar();
                 setMessage(`🎉 Màn ${currentLevel+1} HOÀN THÀNH! Chúc mừng!`, true);
                 render();
+                saveProgress();
             }
 
             // ============================================================
@@ -801,14 +784,12 @@
             function render() {
                 ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
-                // Vẽ nền
                 const grad = ctx.createLinearGradient(0, 0, CANVAS_SIZE, CANVAS_SIZE);
                 grad.addColorStop(0, '#0f1f2f');
                 grad.addColorStop(1, '#1a2a3a');
                 ctx.fillStyle = grad;
                 ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
-                // Vẽ lưới (mờ)
                 ctx.strokeStyle = 'rgba(255,255,255,0.03)';
                 ctx.lineWidth = 0.5;
                 for (let i = 0; i <= GRID_SIZE; i++) {
@@ -822,7 +803,6 @@
                     ctx.stroke();
                 }
 
-                // Vẽ tường (chướng ngại vật)
                 for (let w of walls) {
                     const x = w.x * CELL_SIZE;
                     const y = w.y * CELL_SIZE;
@@ -836,7 +816,6 @@
                     ctx.strokeRect(x + 1, y + 1, CELL_SIZE - 2, CELL_SIZE - 2);
                 }
 
-                // Vẽ thức ăn
                 if (food) {
                     const fx = food.x * CELL_SIZE;
                     const fy = food.y * CELL_SIZE;
@@ -854,14 +833,12 @@
                     ctx.arc(fx + CELL_SIZE / 2, fy + CELL_SIZE / 2, CELL_SIZE / 2 - 2, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.shadowBlur = 0;
-                    // Lá
                     ctx.fillStyle = '#27ae60';
                     ctx.beginPath();
                     ctx.arc(fx + CELL_SIZE / 2 + 4, fy + CELL_SIZE / 2 - 4, 4, 0, Math.PI * 2);
                     ctx.fill();
                 }
 
-                // Vẽ rắn
                 for (let i = 0; i < snake.length; i++) {
                     const s = snake[i];
                     const x = s.x * CELL_SIZE;
@@ -869,7 +846,6 @@
                     const padding = i === 0 ? 1 : 2;
                     const radius = i === 0 ? 4 : 3;
 
-                    // Màu theo vị trí
                     const ratio = i / snake.length;
                     const r = Math.floor(30 + 40 * (1 - ratio));
                     const g = Math.floor(180 - 60 * ratio);
@@ -883,10 +859,8 @@
                     ctx.fill();
                     ctx.shadowBlur = 0;
 
-                    // Mắt cho đầu
                     if (i === 0) {
                         ctx.fillStyle = '#fff';
-                        const eyeOff = 4;
                         const eyeSize = 3;
                         let ex1, ey1, ex2, ey2;
                         if (direction.dx === 1) {
@@ -926,7 +900,6 @@
                     }
                 }
 
-                // Overlay nếu game over
                 if (gameOver) {
                     ctx.fillStyle = 'rgba(0,0,0,0.5)';
                     ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
@@ -946,7 +919,6 @@
                 }
             }
 
-            // roundRect polyfill cho canvas
             CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
                 if (r > w / 2) r = w / 2;
                 if (r > h / 2) r = h / 2;
@@ -967,8 +939,231 @@
             //  UI UPDATE
             // ============================================================
             function updateUI() {
-                scoreDisplay.textContent = score;
+                scoreDisplay.textContent = `${applesEaten}/${applesNeeded}`;
                 levelDisplay.textContent = currentLevel + 1;
-                // Hiển thị tiến độ táo
-                const progress = `${applesEaten}/${applesNeeded}`;
-                document.querySelector('.stats span:first-child').innerHTML = `
+            }
+
+            function setMessage(text, isGood = true) {
+                messageEl.innerHTML = text;
+                messageEl.style.color = isGood ? '#88aabb' : '#f28b82';
+            }
+
+            // ============================================================
+            //  LEVEL BAR
+            // ============================================================
+            function updateLevelBar() {
+                levelBar.innerHTML = '';
+                for (let i = 0; i < LEVELS.length; i++) {
+                    const btn = document.createElement('button');
+                    btn.className = 'level-btn';
+                    btn.textContent = `${i+1}`;
+
+                    if (unlockedLevels[i]) {
+                        btn.classList.add('unlocked');
+                        if (completedLevels.includes(i)) {
+                            btn.classList.add('completed');
+                            btn.textContent = `⭐ ${i+1}`;
+                        }
+                        if (i === currentLevel) {
+                            btn.classList.add('current');
+                        }
+                        btn.addEventListener('click', () => {
+                            if (i === currentLevel) {
+                                resetLevel();
+                            } else if (unlockedLevels[i]) {
+                                if (gameLoopInterval) {
+                                    clearInterval(gameLoopInterval);
+                                    gameLoopInterval = null;
+                                }
+                                currentLevel = i;
+                                gameRunning = false;
+                                gamePaused = false;
+                                initLevel(currentLevel);
+                                btnStart.textContent = '▶ Bắt đầu';
+                                btnStart.disabled = false;
+                                btnPause.disabled = true;
+                                setMessage(`📦 Chuyển sang màn ${i+1}: ${LEVELS[i].label}`, true);
+                            }
+                        });
+                    } else {
+                        btn.classList.add('locked');
+                        btn.textContent = `🔒 ${i+1}`;
+                    }
+                    levelBar.appendChild(btn);
+                }
+            }
+
+            // ============================================================
+            //  KEYBOARD CONTROLS
+            // ============================================================
+            document.addEventListener('keydown', (e) => {
+                const key = e.key;
+
+                if (key === ' ' || key === 'Space') {
+                    e.preventDefault();
+                    if (!gameRunning && !gameOver && !levelCompleted) {
+                        startGame();
+                    } else if (gameRunning && !gamePaused && !gameOver && !levelCompleted) {
+                        pauseGame();
+                    } else if (gamePaused) {
+                        pauseGame();
+                    } else if (gameOver || levelCompleted) {
+                        resetLevel();
+                        setTimeout(() => startGame(), 100);
+                    }
+                    return;
+                }
+
+                if (!gameRunning || gamePaused || gameOver || levelCompleted) return;
+
+                const newDir = { ...direction };
+                if (key === 'ArrowUp' && direction.dy !== 1) {
+                    e.preventDefault();
+                    newDir.dx = 0;
+                    newDir.dy = -1;
+                } else if (key === 'ArrowDown' && direction.dy !== -1) {
+                    e.preventDefault();
+                    newDir.dx = 0;
+                    newDir.dy = 1;
+                } else if (key === 'ArrowLeft' && direction.dx !== 1) {
+                    e.preventDefault();
+                    newDir.dx = -1;
+                    newDir.dy = 0;
+                } else if (key === 'ArrowRight' && direction.dx !== -1) {
+                    e.preventDefault();
+                    newDir.dx = 1;
+                    newDir.dy = 0;
+                } else {
+                    return;
+                }
+                nextDirection = newDir;
+            });
+
+            // ============================================================
+            //  TOUCH CONTROLS
+            // ============================================================
+            let touchStartX = 0;
+            let touchStartY = 0;
+
+            canvas.addEventListener('touchstart', (e) => {
+                const touch = e.touches[0];
+                touchStartX = touch.clientX;
+                touchStartY = touch.clientY;
+                e.preventDefault();
+            });
+
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+            });
+
+            canvas.addEventListener('touchend', (e) => {
+                if (!touchStartX || !touchStartY) return;
+                const touch = e.changedTouches[0];
+                const dx = touch.clientX - touchStartX;
+                const dy = touch.clientY - touchStartY;
+
+                if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
+                    if (!gameRunning && !gameOver && !levelCompleted) {
+                        startGame();
+                    } else if (gameRunning && !gamePaused && !gameOver && !levelCompleted) {
+                        pauseGame();
+                    } else if (gamePaused) {
+                        pauseGame();
+                    } else if (gameOver || levelCompleted) {
+                        resetLevel();
+                        setTimeout(() => startGame(), 100);
+                    }
+                    return;
+                }
+
+                if (!gameRunning || gamePaused || gameOver || levelCompleted) return;
+
+                const newDir = { ...direction };
+                if (Math.abs(dx) > Math.abs(dy)) {
+                    if (dx > 0 && direction.dx !== -1) {
+                        newDir.dx = 1;
+                        newDir.dy = 0;
+                    } else if (dx < 0 && direction.dx !== 1) {
+                        newDir.dx = -1;
+                        newDir.dy = 0;
+                    }
+                } else {
+                    if (dy > 0 && direction.dy !== -1) {
+                        newDir.dx = 0;
+                        newDir.dy = 1;
+                    } else if (dy < 0 && direction.dy !== 1) {
+                        newDir.dx = 0;
+                        newDir.dy = -1;
+                    }
+                }
+                nextDirection = newDir;
+                touchStartX = 0;
+                touchStartY = 0;
+            });
+
+            // ============================================================
+            //  BUTTON EVENTS
+            // ============================================================
+            btnStart.addEventListener('click', () => {
+                if (gameOver || levelCompleted) {
+                    resetLevel();
+                    setTimeout(() => startGame(), 100);
+                } else if (!gameRunning) {
+                    startGame();
+                } else if (gameRunning && gamePaused) {
+                    pauseGame();
+                }
+            });
+
+            btnPause.addEventListener('click', pauseGame);
+            btnReset.addEventListener('click', resetLevel);
+
+            // ============================================================
+            //  SAVE / LOAD PROGRESS
+            // ============================================================
+            function saveProgress() {
+                try {
+                    localStorage.setItem('snake_unlocked', JSON.stringify(unlockedLevels));
+                    localStorage.setItem('snake_completed', JSON.stringify(completedLevels));
+                } catch (e) {}
+            }
+
+            function loadProgress() {
+                try {
+                    const unlocked = localStorage.getItem('snake_unlocked');
+                    const completed = localStorage.getItem('snake_completed');
+                    if (unlocked) unlockedLevels = JSON.parse(unlocked);
+                    if (completed) completedLevels = JSON.parse(completed);
+                } catch (e) {}
+            }
+
+            // ============================================================
+            //  BOOT
+            // ============================================================
+            function initGame() {
+                loadProgress();
+                // Đảm bảo màn 1 luôn mở
+                unlockedLevels[0] = true;
+                // Tìm màn cao nhất đã mở
+                let highest = 0;
+                for (let i = 0; i < unlockedLevels.length; i++) {
+                    if (unlockedLevels[i]) highest = i;
+                }
+                currentLevel = highest;
+                initLevel(currentLevel);
+                updateLevelBar();
+                if (currentLevel > 0) {
+                    setMessage(`📂 Đã tải tiến trình: Màn ${currentLevel+1}`, true);
+                } else {
+                    setMessage('🎯 Màn 1: Ăn 3 táo để thắng! Dùng phím mũi tên để di chuyển.', true);
+                }
+            }
+
+            initGame();
+            console.log('🐍 Snake Game 15 Levels loaded!');
+            console.log(`📊 Unlocked: ${unlockedLevels.filter(v=>v).length}/${LEVELS.length}`);
+
+        })();
+    </script>
+</body>
+</html>
