@@ -1,0 +1,802 @@
+--============================================================
+-- AXIOM FPS TEST MENU
+-- Rayfield + ESP + TRACER + FOV + AUTO AIM + SPEED/JUMP
+-- Dùng để test trong game của ông chủ
+--============================================================
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+--============================================================
+-- RAYFIELD
+--============================================================
+
+local Rayfield = loadstring(game:HttpGet(
+    "https://sirius.menu/rayfield"
+))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "⚡ Axiom FPS Test",
+    LoadingTitle = "Axiom FPS",
+    LoadingSubtitle = "ESP / AIM / MOVEMENT",
+    ConfigurationSaving = {
+        Enabled = false
+    },
+    Discord = {
+        Enabled = false
+    },
+    KeySystem = false
+})
+
+--============================================================
+-- CONFIG
+--============================================================
+
+local Config = {
+
+    ESP = {
+        Enabled = false,
+        Tracer = false,
+        TeamCheck = true
+    },
+
+    Aim = {
+        Enabled = false,
+        FOVEnabled = false,
+        FOV = 150,
+        Smoothness = 20,
+        TeamCheck = true,
+        TargetPart = "Head"
+    },
+
+    Movement = {
+        SpeedEnabled = false,
+        Speed = 16,
+
+        JumpEnabled = false,
+        JumpPower = 50
+    }
+}
+
+--============================================================
+-- UTILITY
+--============================================================
+
+local function GetCharacter(player)
+    return player.Character
+end
+
+local function GetHumanoid(player)
+
+    local character = GetCharacter(player)
+
+    if not character then
+        return nil
+    end
+
+    return character:FindFirstChildOfClass("Humanoid")
+end
+
+local function GetRoot(player)
+
+    local character = GetCharacter(player)
+
+    if not character then
+        return nil
+    end
+
+    return character:FindFirstChild("HumanoidRootPart")
+end
+
+local function IsAlive(player)
+
+    local humanoid = GetHumanoid(player)
+
+    return humanoid ~= nil
+        and humanoid.Health > 0
+end
+
+local function IsEnemy(player)
+
+    if player == LocalPlayer then
+        return false
+    end
+
+    if Config.ESP.TeamCheck
+        or Config.Aim.TeamCheck then
+
+        if LocalPlayer.Team ~= nil
+            and player.Team ~= nil then
+
+            return LocalPlayer.Team ~= player.Team
+        end
+    end
+
+    return true
+end
+
+--============================================================
+-- ESP
+--============================================================
+
+local ESP = {}
+
+local function RemoveESP(player)
+
+    local data = ESP[player]
+
+    if not data then
+        return
+    end
+
+    if data.Highlight then
+        data.Highlight:Destroy()
+    end
+
+    if data.Billboard then
+        data.Billboard:Destroy()
+    end
+
+    ESP[player] = nil
+end
+
+local function CreateESP(player)
+
+    if player == LocalPlayer then
+        return
+    end
+
+    if not Config.ESP.Enabled then
+        return
+    end
+
+    if not IsEnemy(player) then
+        return
+    end
+
+    local character = player.Character
+
+    if not character then
+        return
+    end
+
+    local humanoid =
+        character:FindFirstChildOfClass("Humanoid")
+
+    local root =
+        character:FindFirstChild("HumanoidRootPart")
+
+    if not humanoid
+        or not root
+        or humanoid.Health <= 0 then
+        return
+    end
+
+    RemoveESP(player)
+
+    ------------------------------------------------------------
+    -- KHUNG ĐỎ
+    ------------------------------------------------------------
+
+    local highlight = Instance.new("Highlight")
+
+    highlight.Name = "AxiomESP"
+
+    highlight.Adornee = character
+
+    highlight.DepthMode =
+        Enum.HighlightDepthMode.AlwaysOnTop
+
+    highlight.FillColor =
+        Color3.fromRGB(255, 0, 0)
+
+    highlight.OutlineColor =
+        Color3.fromRGB(255, 0, 0)
+
+    highlight.FillTransparency = 0.82
+    highlight.OutlineTransparency = 0
+
+    highlight.Parent = character
+
+    ------------------------------------------------------------
+    -- TÊN + DISTANCE
+    ------------------------------------------------------------
+
+    local billboard =
+        Instance.new("BillboardGui")
+
+    billboard.Name = "AxiomESPInfo"
+
+    billboard.Adornee = root
+
+    billboard.AlwaysOnTop = true
+
+    billboard.Size =
+        UDim2.fromOffset(180, 45)
+
+    billboard.StudsOffset =
+        Vector3.new(0, 4, 0)
+
+    billboard.Parent = character
+
+    local text =
+        Instance.new("TextLabel")
+
+    text.BackgroundTransparency = 1
+
+    text.Size =
+        UDim2.fromScale(1, 1)
+
+    text.Font =
+        Enum.Font.GothamBold
+
+    text.TextColor3 =
+        Color3.fromRGB(255, 255, 255)
+
+    text.TextStrokeTransparency = 0
+
+    text.TextScaled = true
+
+    text.Text =
+        player.DisplayName
+
+    text.Parent = billboard
+
+    ESP[player] = {
+        Highlight = highlight,
+        Billboard = billboard,
+        Text = text
+    }
+end
+
+local function UpdateESP()
+
+    for _, player in ipairs(
+        Players:GetPlayers()
+    ) do
+
+        if player ~= LocalPlayer then
+
+            if Config.ESP.Enabled
+                and IsEnemy(player)
+                and IsAlive(player) then
+
+                if not ESP[player] then
+                    CreateESP(player)
+                end
+
+            else
+                RemoveESP(player)
+            end
+        end
+    end
+end
+
+--============================================================
+-- ESP PLAYER EVENTS
+--============================================================
+
+Players.PlayerAdded:Connect(function(player)
+
+    player.CharacterAdded:Connect(function()
+
+        task.wait(0.4)
+
+        if Config.ESP.Enabled then
+            CreateESP(player)
+        end
+    end)
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+    RemoveESP(player)
+end)
+
+--============================================================
+-- FOV GUI
+--============================================================
+
+local FOVGui =
+    Instance.new("ScreenGui")
+
+FOVGui.Name =
+    "AxiomFOV"
+
+FOVGui.ResetOnSpawn = false
+FOVGui.IgnoreGuiInset = true
+FOVGui.Enabled = false
+
+FOVGui.Parent =
+    LocalPlayer:WaitForChild("PlayerGui")
+
+local FOVCircle =
+    Instance.new("Frame")
+
+FOVCircle.Name =
+    "Circle"
+
+FOVCircle.AnchorPoint =
+    Vector2.new(0.5, 0.5)
+
+FOVCircle.Position =
+    UDim2.fromScale(0.5, 0.5)
+
+FOVCircle.BackgroundTransparency = 1
+
+FOVCircle.Size =
+    UDim2.fromOffset(
+        Config.Aim.FOV * 2,
+        Config.Aim.FOV * 2
+    )
+
+FOVCircle.Parent = FOVGui
+
+local FOVCorner =
+    Instance.new("UICorner")
+
+FOVCorner.CornerRadius =
+    UDim.new(1, 0)
+
+FOVCorner.Parent =
+    FOVCircle
+
+local FOVStroke =
+    Instance.new("UIStroke")
+
+FOVStroke.Thickness = 2
+
+FOVStroke.Color =
+    Color3.fromRGB(255, 255, 255)
+
+FOVStroke.Transparency = 0.1
+
+FOVStroke.Parent =
+    FOVCircle
+
+local function UpdateFOV()
+
+    FOVCircle.Size =
+        UDim2.fromOffset(
+            Config.Aim.FOV * 2,
+            Config.Aim.FOV * 2
+        )
+
+    FOVGui.Enabled =
+        Config.Aim.FOVEnabled
+end
+
+--============================================================
+-- TARGET FINDER
+--============================================================
+
+local function GetTarget()
+
+    if not Camera then
+        return nil
+    end
+
+    local viewport =
+        Camera.ViewportSize
+
+    local center =
+        Vector2.new(
+            viewport.X / 2,
+            viewport.Y / 2
+        )
+
+    local bestPlayer = nil
+
+    local bestDistance =
+        Config.Aim.FOV
+
+    for _, player in ipairs(
+        Players:GetPlayers()
+    ) do
+
+        if IsEnemy(player)
+            and IsAlive(player) then
+
+            local character =
+                player.Character
+
+            local head =
+                character
+                and character:FindFirstChild(
+                    Config.Aim.TargetPart
+                )
+
+            if head
+                and head:IsA("BasePart") then
+
+                local screen,
+                    visible =
+                    Camera:WorldToViewportPoint(
+                        head.Position
+                    )
+
+                if visible then
+
+                    local point =
+                        Vector2.new(
+                            screen.X,
+                            screen.Y
+                        )
+
+                    local distance =
+                        (
+                            point - center
+                        ).Magnitude
+
+                    if distance <
+                        bestDistance then
+
+                        bestDistance =
+                            distance
+
+                        bestPlayer =
+                            player
+                    end
+                end
+            end
+        end
+    end
+
+    return bestPlayer
+end
+
+--============================================================
+-- AIM
+--============================================================
+
+local function AimAt(player)
+
+    if not player then
+        return
+    end
+
+    local character =
+        player.Character
+
+    if not character then
+        return
+    end
+
+    local head =
+        character:FindFirstChild(
+            Config.Aim.TargetPart
+        )
+
+    if not head
+        or not head:IsA("BasePart") then
+        return
+    end
+
+    local current =
+        Camera.CFrame
+
+    local desired =
+        CFrame.lookAt(
+            current.Position,
+            head.Position
+        )
+
+    local alpha =
+        math.clamp(
+            Config.Aim.Smoothness / 100,
+            0.01,
+            1
+        )
+
+    Camera.CFrame =
+        current:Lerp(
+            desired,
+            alpha
+        )
+end
+
+--============================================================
+-- MOVEMENT
+--============================================================
+
+local function ApplyMovement()
+
+    local humanoid =
+        GetHumanoid(LocalPlayer)
+
+    if not humanoid then
+        return
+    end
+
+    ------------------------------------------------------------
+    -- SPEED
+    ------------------------------------------------------------
+
+    if Config.Movement.SpeedEnabled then
+
+        humanoid.WalkSpeed =
+            Config.Movement.Speed
+    end
+
+    ------------------------------------------------------------
+    -- JUMP
+    ------------------------------------------------------------
+
+    if Config.Movement.JumpEnabled then
+
+        humanoid.UseJumpPower = true
+
+        humanoid.JumpPower =
+            Config.Movement.JumpPower
+    end
+end
+
+--============================================================
+-- AIM TAB
+--============================================================
+
+local AimTab =
+    Window:CreateTab(
+        "🎯 Aim",
+        4483362458
+    )
+
+AimTab:CreateToggle({
+    Name = "Auto Aim",
+    CurrentValue = false,
+
+    Callback = function(value)
+
+        Config.Aim.Enabled =
+            value
+    end
+})
+
+AimTab:CreateToggle({
+    Name = "FOV",
+    CurrentValue = false,
+
+    Callback = function(value)
+
+        Config.Aim.FOVEnabled =
+            value
+
+        UpdateFOV()
+    end
+})
+
+AimTab:CreateSlider({
+    Name = "FOV Size",
+
+    Range = {
+        20,
+        600
+    },
+
+    Increment = 5,
+
+    CurrentValue = 150,
+
+    Callback = function(value)
+
+        Config.Aim.FOV =
+            value
+
+        UpdateFOV()
+    end
+})
+
+AimTab:CreateSlider({
+    Name = "Aim Smoothness",
+
+    Range = {
+        1,
+        100
+    },
+
+    Increment = 1,
+
+    CurrentValue = 20,
+
+    Callback = function(value)
+
+        Config.Aim.Smoothness =
+            value
+    end
+})
+
+AimTab:CreateToggle({
+    Name = "Team Check",
+
+    CurrentValue = true,
+
+    Callback = function(value)
+
+        Config.Aim.TeamCheck =
+            value
+    end
+})
+
+--============================================================
+-- ESP TAB
+--============================================================
+
+local ESPTab =
+    Window:CreateTab(
+        "👁 ESP",
+        4483362458
+    )
+
+ESPTab:CreateToggle({
+    Name = "Enemy ESP",
+
+    CurrentValue = false,
+
+    Callback = function(value)
+
+        Config.ESP.Enabled =
+            value
+
+        if not value then
+
+            for player in pairs(ESP) do
+                RemoveESP(player)
+            end
+
+        else
+
+            UpdateESP()
+        end
+    end
+})
+
+ESPTab:CreateToggle({
+    Name = "Team Check",
+
+    CurrentValue = true,
+
+    Callback = function(value)
+
+        Config.ESP.TeamCheck =
+            value
+
+        UpdateESP()
+    end
+})
+
+--============================================================
+-- MOVEMENT TAB
+--============================================================
+
+local MovementTab =
+    Window:CreateTab(
+        "🏃 Movement",
+        4483362458
+    )
+
+MovementTab:CreateToggle({
+    Name = "Speed Buff",
+
+    CurrentValue = false,
+
+    Callback = function(value)
+
+        Config.Movement.SpeedEnabled =
+            value
+
+        ApplyMovement()
+    end
+})
+
+MovementTab:CreateSlider({
+    Name = "WalkSpeed",
+
+    Range = {
+        16,
+        200
+    },
+
+    Increment = 1,
+
+    CurrentValue = 16,
+
+    Callback = function(value)
+
+        Config.Movement.Speed =
+            value
+
+        ApplyMovement()
+    end
+})
+
+MovementTab:CreateToggle({
+    Name = "Jump Buff",
+
+    CurrentValue = false,
+
+    Callback = function(value)
+
+        Config.Movement.JumpEnabled =
+            value
+
+        ApplyMovement()
+    end
+})
+
+MovementTab:CreateSlider({
+    Name = "JumpPower",
+
+    Range = {
+        50,
+        300
+    },
+
+    Increment = 5,
+
+    CurrentValue = 50,
+
+    Callback = function(value)
+
+        Config.Movement.JumpPower =
+            value
+
+        ApplyMovement()
+    end
+})
+
+--============================================================
+-- MAIN LOOP
+--============================================================
+
+RunService.RenderStepped:Connect(function()
+
+    UpdateFOV()
+
+    if Config.ESP.Enabled then
+        UpdateESP()
+    end
+
+    if Config.Aim.Enabled
+        and Config.Aim.FOVEnabled then
+
+        local target =
+            GetTarget()
+
+        if target then
+            AimAt(target)
+        end
+    end
+
+    ApplyMovement()
+end)
+
+--============================================================
+-- RESPAWN
+--============================================================
+
+LocalPlayer.CharacterAdded:Connect(function()
+
+    task.wait(0.7)
+
+    ApplyMovement()
+
+    if Config.ESP.Enabled then
+        UpdateESP()
+    end
+end)
+
+--============================================================
+-- READY
+--============================================================
+
+print(
+    "[AXIOM] FPS TEST MENU LOADED"
+)
+
+Rayfield:Notify({
+    Title = "Axiom FPS",
+    Content = "ESP / FOV / Aim / Movement loaded.",
+    Duration = 4
+})
